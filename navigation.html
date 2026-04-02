@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navify - Indoor Route Planner</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body class="nav-body">
+
+    <div class="layout">
+        <div class="sidebar glass-panel">
+            <h2 id="ui-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Navify</span>
+                <button onclick="triggerEmergency()" class="btn btn-danger" id="btn-emergency" style="font-size: 0.8rem; padding: 5px 10px; background-color: #EF4444; color: white;">🚨 Emergency Exit</button>
+            </h2>
+
+            <div id="offline-banner" class="alert-banner hidden" style="background: #FFFBEB; color: #B45309; border-color: #FCD34D;">
+                ⚠ Offline Mode: Limited functionality. Maps cached.
+            </div>
+
+            <div class="form-group">
+                <label id="ui-lang">Language / భాష / भाषा</label>
+                <select id="language" class="select-box" onchange="changeLanguage()">
+                    <option value="en">English</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                </select>
+            </div>
+
+            <div id="geo-error-banner" class="alert-banner hidden">
+                ⚠️ Geolocation Blocked. Ensure you are using HTTPS. Using simulation mode.
+            </div>
+
+            <div class="form-group floor-selector">
+                <label>Select Floor</label>
+                <div class="floor-buttons">
+                    <button id="btn-floor-0" class="floor-btn active" onclick="switchFloor(0)">G Floor</button>
+                    <button id="btn-floor-1" class="floor-btn" onclick="switchFloor(1)">I Floor</button>
+                    <button id="btn-floor-2" class="floor-btn" onclick="switchFloor(2)">II Floor</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="ui-start">Starting Point</label>
+                <input type="text" id="start-node-display" readonly value="Detecting location..." class="input-readonly">
+            </div>
+
+            <div class="form-group">
+                <label id="ui-dest">Destination</label>
+                <input type="text" id="destination-search" class="select-box" placeholder="Search: 'Library', 'Canteen', 'Admin'..." onkeyup="filterDestinations()">
+                <select id="destination" class="select-box mt-10">
+                    <option value="" id="ui-sel-dest">-- Select Destination --</option>
+                    <optgroup label="Outdoor Blocks" id="opt-blocks">
+                        <option value="admin">Block A (Admin)</option>
+                        <option value="cse_block">Block B (CSE)</option>
+                        <option value="block_c">Block C</option>
+                        <option value="canteen">Canteen</option>
+                    </optgroup>
+                    <optgroup label="Block E (Library) - G Floor" id="opt-lib-0">
+                        <option value="lib_entrance_g">Library Entrance</option>
+                        <option value="lib_issue_g">Library Books Issue Counter</option>
+                    </optgroup>
+                    <optgroup label="Block E (Library) - I Floor" id="opt-lib-1">
+                        <option value="lib_reading_1">Library - Reading Room</option>
+                    </optgroup>
+                    <optgroup label="Block E (Library) - II Floor" id="opt-lib-2">
+                        <option value="lib_digital_2">Digital Library</option>
+                        <option value="lib_iesdc_2">IESDC & Discussion Rooms</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="form-group accessibility-toggle">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="accessibility-mode" onchange="toggleAccessibility()">
+                    <span style="font-size: 1.1rem;">🧑‍🦽</span> Accessibility Mode (Wheelchair friendly)
+                </label>
+            </div>
+
+            <button onclick="calculateRoute()" class="btn btn-primary full-width" id="btn-get-dir">Get Directions</button>
+            <button onclick="toggleVoice()" id="voice-btn" class="btn btn-secondary full-width mt-10">
+                🔈 Voice Guide: OFF
+            </button>
+
+            <button onclick="startSimulation()" id="simulate-btn" class="btn btn-success full-width mt-10"
+                style="background: #10B981; color: white;">
+                🚶 Simulate Walking (Testing)
+            </button>
+
+            <div id="instructionsPanel" class="instructions hidden">
+                <h3 id="ui-step">Step-by-Step</h3>
+                <ul id="instructionsList"></ul>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Data structures and algorithm logic -->
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then((reg) => {
+                    console.log('ServiceWorker registration successful');
+                }).catch((err) => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+            
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            
+            function updateOnlineStatus() {
+                if (!navigator.onLine) {
+                    document.getElementById('offline-banner').classList.remove('hidden');
+                } else {
+                    document.getElementById('offline-banner').classList.add('hidden');
+                }
+            }
+            // Check initial state
+            updateOnlineStatus();
+        }
+    </script>
+</body>
+
+</html>
