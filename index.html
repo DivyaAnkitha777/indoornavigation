@@ -1,104 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Navify - Smart Indoor Navigation</title>
+
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 2rem;
+            color: white;
+        }
+
+        .glass-container {
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            opacity: 0.8;
+        }
+
+        .btn {
+            margin: 10px;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: #00f2fe;
+            color: black;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: black;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        #reader {
+            width: 100%;
+            max-width: 400px;
+            margin: 10px auto;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #loadingText {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
-<body class="landing-body" style="overflow-y: auto; align-items: flex-start; padding-top: 2rem;">
-    <div class="glass-container text-center" style="max-width: 600px;">
-        <h1 class="title" id="lbl-title">Navify</h1>
-        <p class="subtitle" id="lbl-subtitle">Smart Indoor Navigation. Find your way effortlessly.</p>
+<body>
+    <div class="glass-container">
+        <h1 class="title">🧭 Navify</h1>
+        <p class="subtitle">Smart Indoor Navigation. Find your way effortlessly.</p>
 
-        <div class="qr-simulation-box">
-            <div class="qr-icon">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
-                </svg>
-            </div>
-            <h2 id="lbl-scan">Scan QR to Enter</h2>
-            <p id="lbl-sim-desc">Point your camera at a building entrance QR code.</p>
+        <h2>Scan QR to Enter</h2>
+        <p>Point your camera at a building entrance QR code.</p>
 
-            <div id="reader"
-                style="width: 100%; max-width: 400px; margin: 10px auto; border-radius: 12px; overflow: hidden;"></div>
+        <div id="reader"></div>
+        <p id="loadingText">📡 Scanning...</p>
 
-            <div class="button-group">
-                <button class="btn btn-primary" onclick="startScanner()" id="btn-scan">📷 Start Camera Scanner</button>
-                <button class="btn btn-secondary" onclick="simulateScan('main_gate')" id="btn-main-qr">Bypass: Simulate
-                    Main Gate</button>
-            </div>
+        <div>
+            <button class="btn btn-primary" onclick="startScanner()">📷 Start Camera</button>
+            <button class="btn btn-secondary" onclick="simulateScan('main_gate')">Simulate Main Gate</button>
         </div>
 
-        <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--glass-border);">
+        <hr style="margin: 2rem 0; border: 1px solid rgba(255,255,255,0.2);">
 
-        <div class="qr-generation">
-            <h3>Test QR Codes</h3>
-            <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Scan these with your phone or the camera
-                scanner above to test.</p>
-            <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-                <div>
-                    <div id="qr-main" style="background: white; padding: 10px;"></div>
-                    <p style="font-size: 0.8rem; margin-top: 5px;">Main Gate</p>
-                </div>
-                <div>
-                    <div id="qr-ele" style="background: white; padding: 10px;"></div>
-                    <p style="font-size: 0.8rem; margin-top: 5px;">Library</p>
-                </div>
+        <h3>Test QR Codes</h3>
+
+        <div style="display:flex; justify-content:space-around; flex-wrap:wrap;">
+            <div>
+                <div id="qr-main" style="background:white; padding:10px;"></div>
+                <p>Main Gate</p>
+            </div>
+
+            <div>
+                <div id="qr-lib" style="background:white; padding:10px;"></div>
+                <p>Library</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Generate Test QR Codes using current host
         window.onload = () => {
             const baseUrl = window.location.href.replace('index.html', 'navigation.html');
-            new QRCode(document.getElementById("qr-main"), { text: `${baseUrl}?start=main_gate`, width: 128, height: 128 });
-            new QRCode(document.getElementById("qr-ele"), { text: `${baseUrl}?start=library`, width: 128, height: 128 });
+
+            new QRCode(document.getElementById("qr-main"), {
+                text: `${baseUrl}?start=main_gate`,
+                width: 128,
+                height: 128
+            });
+
+            new QRCode(document.getElementById("qr-lib"), {
+                text: `${baseUrl}?start=library`,
+                width: 128,
+                height: 128
+            });
         };
 
         const html5QrCode = new Html5Qrcode("reader");
 
         function startScanner() {
+            document.getElementById("loadingText").style.display = "block";
+
             html5QrCode.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
+
                 (decodedText) => {
                     html5QrCode.stop().then(() => {
+                        alert("✅ QR Detected! Redirecting...");
                         window.location.href = decodedText;
                     });
                 },
-                (errorMessage) => {
-                    // ignore continuous scanning errors
-                }
-            ).catch((err) => {
-                alert("Camera access failed or not supported.");
+
+                () => {}
+            ).catch(() => {
+                alert("❌ Camera access failed");
             });
         }
+
         function simulateScan(startNodeId) {
+            alert("Simulating QR...");
             window.location.href = `navigation.html?start=${startNodeId}`;
         }
 
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then((reg) => {
-                    console.log('ServiceWorker registration successful');
-                }).catch((err) => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
+            navigator.serviceWorker.register('sw.js');
         }
     </script>
 </body>
-
 </html>
