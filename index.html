@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +32,7 @@
             width: 90%;
             max-width: 600px;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
         .title {
@@ -99,8 +100,10 @@
         <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
             <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
                 <button class="btn btn-primary" onclick="startScanner()">📷 Start Camera</button>
-                <button class="btn btn-primary" onclick="document.getElementById('qr-upload').click()">📂 Upload from Gallery</button>
-                <input type="file" id="qr-upload" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+                <button class="btn btn-primary" onclick="document.getElementById('qr-upload').click()">📂 Upload from
+                    Gallery</button>
+                <input type="file" id="qr-upload" accept="image/*" style="display: none;"
+                    onchange="handleFileUpload(event)">
             </div>
             <button class="btn btn-secondary" onclick="simulateScan('main_gate')">Simulate Main Gate</button>
         </div>
@@ -130,7 +133,7 @@
             } else if (!fullUrl.endsWith('.html')) {
                 fullUrl += '/index.html';
             }
-            
+
             const baseUrl = fullUrl.replace('index.html', 'navigation.html');
 
             new QRCode(document.getElementById("qr-main"), {
@@ -162,7 +165,7 @@
                     });
                 },
 
-                () => {}
+                () => { }
             ).catch(() => {
                 alert("❌ Camera access failed");
             });
@@ -173,7 +176,7 @@
             if (!file) return;
 
             document.getElementById("loadingText").style.display = "block";
-            
+
             html5QrCode.scanFile(file, true)
                 .then(decodedText => {
                     document.getElementById("loadingText").style.display = "none";
@@ -196,4 +199,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -44,7 +44,7 @@ function initDB() {
 function seedData() {
     // We assign different Floors:
     // 0 = Ground, 1 = First Floor, 2 = Second Floor
-    
+
     // GPS coordinates focus around: 16.5660, 81.5218 (Library Area)
     const nodes = [
         // --- OUTDOOR / OTHER BLOCKS ---
@@ -53,7 +53,7 @@ function seedData() {
         { id: 'cse_block', name: 'Block B (CSE)', type: 'block', floor: 0, lat: 16.5660, lng: 81.5225 },
         { id: 'canteen', name: 'Canteen', type: 'service', floor: 0, lat: 16.5665, lng: 81.5230 },
         { id: 'block_c', name: 'Block C', type: 'block', floor: 0, lat: 16.5665, lng: 81.5210 },
-        
+
         // --- BLOCK E (LIBRARY) - FLOOR G (0) ---
         { id: 'lib_entrance_g', name: 'Library Entrance (G)', type: 'entrance', floor: 0, lat: 16.56600, lng: 81.52180 },
         { id: 'lib_issue_g', name: 'Library Books Issue Counter (G)', type: 'service', floor: 0, lat: 16.56605, lng: 81.52185 },

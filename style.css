@@ -27,9 +27,17 @@ body {
 }
 
 @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Landing Page Specific */
@@ -370,7 +378,7 @@ h1.title {
 .floor-btn.active {
     background: white;
     color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     transform: scale(1.02);
 }
 
@@ -378,11 +386,13 @@ h1.title {
 .sidebar::-webkit-scrollbar {
     width: 6px;
 }
+
 .sidebar::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .sidebar::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
 }
 
@@ -397,7 +407,10 @@ h1.title {
 }
 
 @keyframes sk-pulseScaleOut {
-    0% { transform: scale(0); }
+    0% {
+        transform: scale(0);
+    }
+
     100% {
         transform: scale(1.0);
         opacity: 0;
@@ -436,7 +449,7 @@ h1.title {
     font-size: 1.5rem;
     font-weight: 700;
     z-index: 9999;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     border: 2px solid var(--primary-color);
     display: flex;
     align-items: center;
@@ -449,6 +462,13 @@ h1.title {
 }
 
 @keyframes slideDownFade {
-    0% { top: -50px; opacity: 0; }
-    100% { top: 20px; opacity: 1; }
-}
+    0% {
+        top: -50px;
+        opacity: 0;
+    }
+
+    100% {
+        top: 20px;
+        opacity: 1;
+    }
+}
