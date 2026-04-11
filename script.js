@@ -415,6 +415,12 @@ function updateUserMarker(lat, lng) {
 // ======================= ADVANCED SMOOTH SIMULATION =======================
 function startSimulation() {
     if (currentPathNodes.length === 0) { alert("Please get a route first!"); return; }
+    if (currentPathNodes.length === 1) { 
+        alert("You are already at your destination!"); 
+        showLiveAlert("✅ Arrived"); 
+        setTimeout(hideLiveAlert, 3000);
+        return; 
+    }
 
     document.getElementById('simulate-btn').disabled = true;
     if(animationFrameId) cancelAnimationFrame(animationFrameId);
