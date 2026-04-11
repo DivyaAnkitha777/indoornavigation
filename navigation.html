@@ -55,6 +55,13 @@
             <div class="form-group">
                 <label id="ui-dest">Destination</label>
                 <input type="text" id="destination-search" class="select-box" placeholder="Search: 'Library', 'Canteen', 'Admin'..." onkeyup="filterDestinations()">
+                
+                <div class="quick-chips">
+                    <span class="chip" onclick="setQuickDestination('canteen')">☕ Canteen</span>
+                    <span class="chip" onclick="setQuickDestination('lib_reading_1')">📚 Library Reading Room</span>
+                    <span class="chip" onclick="setQuickDestination('admin')">🏢 Admin Block</span>
+                </div>
+
                 <select id="destination" class="select-box mt-10">
                     <option value="" id="ui-sel-dest">-- Select Destination --</option>
                     <optgroup label="Outdoor Blocks" id="opt-blocks">
@@ -101,6 +108,7 @@
         </div>
 
         <div class="map-container">
+            <div id="live-alert" class="live-alert hidden"></div>
             <div id="map"></div>
         </div>
     </div>
@@ -129,6 +137,11 @@
             }
             // Check initial state
             updateOnlineStatus();
+        }
+
+        function setQuickDestination(val) {
+            document.getElementById('destination').value = val;
+            calculateRoute();
         }
     </script>
 </body>

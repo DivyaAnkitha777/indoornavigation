@@ -91,10 +91,17 @@
         <p>Point your camera at a building entrance QR code.</p>
 
         <div id="reader"></div>
-        <p id="loadingText">📡 Scanning...</p>
+        <div id="loadingText" style="display: none;">
+            <div class="pulse-loader"></div>
+            <p style="margin-top: 10px; font-weight: 500; color: white;">📡 Decoding QR...</p>
+        </div>
 
-        <div>
-            <button class="btn btn-primary" onclick="startScanner()">📷 Start Camera</button>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <button class="btn btn-primary" onclick="startScanner()">📷 Start Camera</button>
+                <button class="btn btn-primary" onclick="document.getElementById('qr-upload').click()">📂 Upload from Gallery</button>
+                <input type="file" id="qr-upload" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+            </div>
             <button class="btn btn-secondary" onclick="simulateScan('main_gate')">Simulate Main Gate</button>
         </div>
 
@@ -117,7 +124,14 @@
 
     <script>
         window.onload = () => {
-            const baseUrl = window.location.href.replace('index.html', 'navigation.html');
+            let fullUrl = window.location.href.split('?')[0].split('#')[0];
+            if (fullUrl.endsWith('/')) {
+                fullUrl += 'index.html';
+            } else if (!fullUrl.endsWith('.html')) {
+                fullUrl += '/index.html';
+            }
+            
+            const baseUrl = fullUrl.replace('index.html', 'navigation.html');
 
             new QRCode(document.getElementById("qr-main"), {
                 text: `${baseUrl}?start=main_gate`,
@@ -152,6 +166,24 @@
             ).catch(() => {
                 alert("❌ Camera access failed");
             });
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById("loadingText").style.display = "block";
+            
+            html5QrCode.scanFile(file, true)
+                .then(decodedText => {
+                    document.getElementById("loadingText").style.display = "none";
+                    alert("✅ QR Detected! Redirecting...");
+                    window.location.href = decodedText;
+                })
+                .catch(err => {
+                    document.getElementById("loadingText").style.display = "none";
+                    alert("❌ Could not read QR from the image. Please try another one.");
+                });
         }
 
         function simulateScan(startNodeId) {

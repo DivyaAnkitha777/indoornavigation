@@ -415,7 +415,13 @@ function startSimulation() {
     updateUserMarker(currentN.lat, currentN.lng);
     map.setView([currentN.lat, currentN.lng], 20);
     highlightInstruction(0);
-    if(voiceEnabled) speak(currentPathInstructions[0]);
+    
+    // Starting Alert Initializer
+    if (currentPathNodes.length > 1) {
+        let text = `⬆️ Move Forward to ${currentPathNodes[1].name}`;
+        showLiveAlert(text);
+        if(voiceEnabled) speak(text);
+    }
 
     function animate(timestamp) {
         if (!startTimestamp) startTimestamp = timestamp;
@@ -452,14 +458,36 @@ function startSimulation() {
             highlightInstruction(currentNodeIndex);
             startTimestamp = null; // Reset for next edge
             
-            // Speak exact instruction from the step-by-step list
-            if (voiceEnabled && currentPathInstructions[currentNodeIndex]) {
-                speak(currentPathInstructions[currentNodeIndex]);
+            // Logic for Granular Turn Alert instead of the full path text
+            if (currentNodeIndex < currentPathNodes.length - 1) {
+                let prevNode = currentNodeIndex > 0 ? currentPathNodes[currentNodeIndex - 1] : null;
+                let currNode = currentPathNodes[currentNodeIndex];
+                let nextNode = currentPathNodes[currentNodeIndex + 1];
+                
+                let actionText = "";
+                if (!prevNode) actionText = `⬆️ Move Forward`;
+                else if (currNode.floor < nextNode.floor) actionText = `⬆️ Stairs Up`;
+                else if (currNode.floor > nextNode.floor) actionText = `⬇️ Stairs Down`;
+                else {
+                    let b1 = getBearing(prevNode.lat, prevNode.lng, currNode.lat, currNode.lng);
+                    let b2 = getBearing(currNode.lat, currNode.lng, nextNode.lat, nextNode.lng);
+                    let diff = (b2 - b1 + 360) % 360;
+                    if (diff > 30 && diff < 160) actionText = `➡️ Turn Right`;
+                    else if (diff > 200 && diff < 330) actionText = `⬅️ Turn Left`;
+                    else actionText = `⬆️ Move Forward`;
+                }
+                
+                showLiveAlert(actionText);
+
+                if (voiceEnabled) speak(actionText);
             }
 
             // If we reached the last node, end the simulation perfectly
             if (currentNodeIndex >= currentPathNodes.length - 1) {
                 simComplete = true;
+                showLiveAlert(`✅ Arrived at ${currentPathNodes[currentNodeIndex].name}`);
+                if (voiceEnabled) speak(`You have arrived at ${currentPathNodes[currentNodeIndex].name}`);
+                setTimeout(hideLiveAlert, 5000);
             }
         }
 
@@ -488,6 +516,24 @@ function toggleVoice() {
 }
 
 // ======================= NAVIFY ADVANCED FEATURES =======================
+function showLiveAlert(text) {
+    const alertBox = document.getElementById('live-alert');
+    if (alertBox) {
+        alertBox.textContent = text;
+        alertBox.classList.remove('hidden');
+        
+        // Restart animation
+        alertBox.style.animation = 'none';
+        alertBox.offsetHeight; /* trigger reflow */
+        alertBox.style.animation = null; 
+    }
+}
+
+function hideLiveAlert() {
+    const alertBox = document.getElementById('live-alert');
+    if (alertBox) alertBox.classList.add('hidden');
+}
+
 function triggerEmergency() {
     if (!startNodeId || !graph[startNodeId]) {
         alert("Cannot determine starting location for emergency exit.");

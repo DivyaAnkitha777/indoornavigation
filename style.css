@@ -19,9 +19,17 @@
 }
 
 body {
-    background: var(--bg-gradient);
+    background: linear-gradient(-45deg, #4f46e5, #7c3aed, #ec4899, #3b82f6);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     color: var(--text-dark);
     min-height: 100vh;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* Landing Page Specific */
@@ -62,24 +70,25 @@ h1.title {
 /* Glassmorphism Containers */
 .glass-container {
     position: relative;
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     padding: 3rem;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     max-width: 500px;
     width: 90%;
     z-index: 10;
+    color: white;
 }
 
 .glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
     border-right: 1px solid var(--glass-border);
     padding: 2rem;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
 }
 
 /* QR Simulation Box */
@@ -108,35 +117,40 @@ h1.title {
 
 /* Buttons */
 .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+    padding: 0.85rem 1.75rem;
+    border-radius: 30px;
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     border: none;
     outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-primary {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .btn-primary:hover {
-    background: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
 }
 
 .btn-secondary {
-    background: var(--secondary-color);
-    color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-secondary:hover {
-    background: #c7d2fe;
+    background: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
 }
 
@@ -204,6 +218,32 @@ h1.title {
     background: #F3F4F6;
     color: var(--text-light);
     cursor: not-allowed;
+}
+
+/* Quick Destination Chips */
+.quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.chip {
+    background: rgba(79, 70, 229, 0.1);
+    color: var(--primary-color);
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(79, 70, 229, 0.2);
+    transition: all 0.2s;
+}
+
+.chip:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
 }
 
 .map-container {
@@ -303,35 +343,65 @@ h1.title {
     }
 }
 
-/* Floor Switcher Styles */
+/* Floor Switcher Styles (iOS segmented control style) */
 .floor-selector {
-    background: #F3F4F6;
-    padding: 10px;
-    border-radius: 10px;
+    background: #E5E7EB;
+    padding: 4px;
+    border-radius: 12px;
 }
 
 .floor-buttons {
     display: flex;
-    gap: 8px;
-    margin-top: 5px;
+    gap: 2px;
 }
 
 .floor-btn {
     flex: 1;
-    padding: 8px 0;
+    padding: 10px 0;
     border: none;
-    border-radius: 6px;
-    background: white;
+    border-radius: 10px;
+    background: transparent;
     font-weight: 600;
     color: var(--text-light);
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .floor-btn.active {
-    background: var(--primary-color);
-    color: white;
+    background: white;
+    color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    transform: scale(1.02);
+}
+
+/* Custom Scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+/* Pulsating Loader */
+.pulse-loader {
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    margin: 20px auto;
+    animation: sk-pulseScaleOut 1s infinite ease-in-out;
+}
+
+@keyframes sk-pulseScaleOut {
+    0% { transform: scale(0); }
+    100% {
+        transform: scale(1.0);
+        opacity: 0;
+    }
 }
 
 /* Alert Banner */
@@ -351,4 +421,34 @@ h1.title {
 
 .alert-banner.hidden {
     display: none;
+}
+
+/* Live Navigation Alert Overlay */
+.live-alert {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    z-index: 9999;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    border: 2px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    animation: slideDownFade 0.5s ease-out forwards;
+}
+
+.live-alert.hidden {
+    display: none;
+}
+
+@keyframes slideDownFade {
+    0% { top: -50px; opacity: 0; }
+    100% { top: 20px; opacity: 1; }
 }
