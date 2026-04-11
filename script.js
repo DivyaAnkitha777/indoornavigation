@@ -430,7 +430,17 @@ function startSimulation() {
     simComplete = false;
     let currentNodeIndex = 0;
     let startTimestamp = null;
-    const durationPerNode = 4000; // 4 seconds per node
+    
+    // We will calculate duration dynamically based on distance, but we need a base duration
+    let getDurationForEdge = (nodeA, nodeB) => {
+        let dist = Math.sqrt(Math.pow(nodeA.lat - nodeB.lat, 2) + Math.pow(nodeA.lng - nodeB.lng, 2));
+        // A tuning factor to convert lat/lng distance to ms. 
+        // 0.001 roughly equals 100 meters. Let's make average speeds ~7-10 seconds per node.
+        let ms = Math.max(7000, dist * 5000000); // minimum 7 seconds per segment
+        return Math.min(ms, 15000); // cap to 15s max per segment
+    };
+
+    let durationPerNode = getDurationForEdge(currentPathNodes[0], currentPathNodes[1] || currentPathNodes[0]);
 
     let currentN = currentPathNodes[0];
     switchFloor(currentN.floor);
@@ -510,6 +520,9 @@ function startSimulation() {
                 showLiveAlert(`✅ Arrived at ${currentPathNodes[currentNodeIndex].name}`);
                 if (voiceEnabled) speak(`You have arrived at ${currentPathNodes[currentNodeIndex].name}`);
                 setTimeout(hideLiveAlert, 5000);
+            } else {
+                // Update duration for the next specific edge
+                durationPerNode = getDurationForEdge(currentPathNodes[currentNodeIndex], currentPathNodes[currentNodeIndex + 1]);
             }
         }
 
