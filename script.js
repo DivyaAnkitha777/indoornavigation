@@ -379,10 +379,26 @@ function speak(text) {
 
 // ======================= LIVE TRACKING (IF AVAILABLE) =====================
 function startNativeTracking() {
+    if (!navigator.geolocation) {
+        console.log("Geolocation is not supported by your browser");
+        return;
+    }
+
     watchId = navigator.geolocation.watchPosition(
-        (pos) => updateUserMarker(pos.coords.latitude, pos.coords.longitude),
-        (err) => console.log("GPS err: ", err),
-        { enableHighAccuracy: true }
+        (pos) => {
+            updateUserMarker(pos.coords.latitude, pos.coords.longitude);
+            // Optionally, we could pan to the user if they drift off screen:
+            // map.panTo([pos.coords.latitude, pos.coords.longitude]);
+        },
+        (err) => {
+            console.warn("GPS Tracking Error: ", err.message);
+            if (err.code === 1) {
+                // Permission denied
+                document.getElementById('geo-error-banner').innerHTML = "⚠️ Location access denied. Please enable GPS permissions in your phone settings to track your physical movement.";
+                document.getElementById('geo-error-banner').classList.remove('hidden');
+            }
+        },
+        { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
     );
 }
 
