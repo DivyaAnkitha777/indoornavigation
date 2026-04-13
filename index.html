@@ -175,6 +175,9 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            // Reset the input so the same file could be selected again.
+            event.target.value = '';
+
             document.getElementById("loadingText").style.display = "block";
 
             html5QrCode.scanFile(file, true)

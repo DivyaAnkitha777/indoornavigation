@@ -1,5 +1,5 @@
 // Constants and State
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 let map, routeLayer, startMarker, endMarker, userMarker;
 let nodes = [];
 let edges = [];
@@ -117,7 +117,11 @@ async function fetchGraphData() {
             nodes = await nodesRes.json(); 
             edges = await edgesRes.json(); 
         }
-    } catch (e) { console.error("Could not fetch from server."); }
+    } catch (e) {
+        console.error("Could not fetch from server.", e);
+        // Fallback for safety if backend isn't running so the app doesn't break
+        alert("Backend server is not running. Simulation will wait until data is available.");
+    }
     
     buildGraph();
     updateUIWithStartNode();
@@ -533,7 +537,7 @@ function startSimulation() {
         }
     }
 
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
 }
 
 function toggleVoice() {
