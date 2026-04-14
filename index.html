@@ -161,7 +161,12 @@
                 (decodedText) => {
                     html5QrCode.stop().then(() => {
                         alert("✅ QR Detected! Redirecting...");
-                        window.location.href = decodedText;
+                        let redirectUrl = decodedText;
+                        const navIndex = redirectUrl.indexOf("navigation.html");
+                        if (navIndex !== -1) {
+                            redirectUrl = redirectUrl.substring(navIndex);
+                        }
+                        window.location.href = redirectUrl;
                     });
                 },
 
@@ -184,7 +189,12 @@
                 .then(decodedText => {
                     document.getElementById("loadingText").style.display = "none";
                     alert("✅ QR Detected! Redirecting...");
-                    window.location.href = decodedText;
+                    let redirectUrl = decodedText;
+                    const navIndex = redirectUrl.indexOf("navigation.html");
+                    if (navIndex !== -1) {
+                        redirectUrl = redirectUrl.substring(navIndex);
+                    }
+                    window.location.href = redirectUrl;
                 })
                 .catch(err => {
                     document.getElementById("loadingText").style.display = "none";
