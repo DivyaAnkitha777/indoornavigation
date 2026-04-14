@@ -110,17 +110,65 @@ function checkUrlParams() {
     }
 }
 
+const staticNodes = [
+    { id: 'main_gate', name: 'Main Gate', type: 'entrance', floor: 0, lat: 16.5650, lng: 81.5220 },
+    { id: 'admin', name: 'Block A (Admin)', type: 'block', floor: 0, lat: 16.5655, lng: 81.5222 },
+    { id: 'cse_block', name: 'Block B (CSE)', type: 'block', floor: 0, lat: 16.5660, lng: 81.5225 },
+    { id: 'canteen', name: 'Canteen', type: 'service', floor: 0, lat: 16.5665, lng: 81.5230 },
+    { id: 'block_c', name: 'Block C', type: 'block', floor: 0, lat: 16.5665, lng: 81.5210 },
+    { id: 'lib_entrance_g', name: 'Library Entrance (G)', type: 'entrance', floor: 0, lat: 16.56600, lng: 81.52180 },
+    { id: 'lib_issue_g', name: 'Library Books Issue Counter (G)', type: 'service', floor: 0, lat: 16.56605, lng: 81.52185 },
+    { id: 'lib_stairs_g', name: 'Library Stairs (G)', type: 'stairs', floor: 0, lat: 16.56610, lng: 81.52190 },
+    { id: 'lib_elevator_g', name: 'Library Elevator (G)', type: 'elevator', floor: 0, lat: 16.56608, lng: 81.52195 },
+    { id: 'lib_stairs_1', name: 'Library Stairs (I)', type: 'stairs', floor: 1, lat: 16.56610, lng: 81.52190 },
+    { id: 'lib_elevator_1', name: 'Library Elevator (I)', type: 'elevator', floor: 1, lat: 16.56608, lng: 81.52195 },
+    { id: 'lib_reading_1', name: 'Library - Reading Room (I)', type: 'room', floor: 1, lat: 16.56605, lng: 81.52185 },
+    { id: 'lib_corridor_1', name: 'First Floor Corridor', type: 'corridor', floor: 1, lat: 16.56607, lng: 81.52187 },
+    { id: 'lib_stairs_2', name: 'Library Stairs (II)', type: 'stairs', floor: 2, lat: 16.56610, lng: 81.52190 },
+    { id: 'lib_elevator_2', name: 'Library Elevator (II)', type: 'elevator', floor: 2, lat: 16.56608, lng: 81.52195 },
+    { id: 'lib_digital_2', name: 'Digital Library (II)', type: 'room', floor: 2, lat: 16.56603, lng: 81.52182 },
+    { id: 'lib_iesdc_2', name: 'IESDC & Discussion Rooms (II)', type: 'room', floor: 2, lat: 16.56608, lng: 81.52182 }
+];
+
+const staticEdges = [
+    { source: 'main_gate', target: 'admin', weight: 80 },
+    { source: 'admin', target: 'cse_block', weight: 60 },
+    { source: 'admin', target: 'block_c', weight: 100 },
+    { source: 'admin', target: 'lib_entrance_g', weight: 40 },
+    { source: 'cse_block', target: 'canteen', weight: 50 },
+    { source: 'cse_block', target: 'lib_entrance_g', weight: 30 },
+    { source: 'block_c', target: 'lib_entrance_g', weight: 50 },
+    { source: 'lib_entrance_g', target: 'lib_issue_g', weight: 10 },
+    { source: 'lib_entrance_g', target: 'lib_stairs_g', weight: 15 },
+    { source: 'lib_issue_g', target: 'lib_stairs_g', weight: 12 },
+    { source: 'lib_entrance_g', target: 'lib_elevator_g', weight: 20 },
+    { source: 'lib_stairs_g', target: 'lib_stairs_1', weight: 30 },
+    { source: 'lib_stairs_1', target: 'lib_stairs_2', weight: 30 },
+    { source: 'lib_elevator_g', target: 'lib_elevator_1', weight: 15 },
+    { source: 'lib_elevator_1', target: 'lib_elevator_2', weight: 15 },
+    { source: 'lib_stairs_1', target: 'lib_corridor_1', weight: 5 },
+    { source: 'lib_elevator_1', target: 'lib_corridor_1', weight: 5 },
+    { source: 'lib_corridor_1', target: 'lib_reading_1', weight: 10 },
+    { source: 'lib_stairs_2', target: 'lib_iesdc_2', weight: 10 },
+    { source: 'lib_stairs_2', target: 'lib_digital_2', weight: 15 },
+    { source: 'lib_elevator_2', target: 'lib_iesdc_2', weight: 10 },
+    { source: 'lib_digital_2', target: 'lib_iesdc_2', weight: 8 }
+];
+
 async function fetchGraphData() {
     try {
         const [nodesRes, edgesRes] = await Promise.all([fetch(`${API_URL}/nodes`), fetch(`${API_URL}/edges`)]);
         if (nodesRes.ok && edgesRes.ok) { 
             nodes = await nodesRes.json(); 
             edges = await edgesRes.json(); 
+            if (nodes.length === 0) throw new Error("Empty DB");
+        } else {
+            throw new Error("HTTP " + nodesRes.status);
         }
     } catch (e) {
-        console.error("Could not fetch from server.", e);
-        // Fallback for safety if backend isn't running so the app doesn't break
-        alert("Backend server is not running. Simulation will wait until data is available.");
+        console.warn("Could not fetch from server. Using offline static map data for Netlify.", e);
+        nodes = staticNodes;
+        edges = staticEdges;
     }
     
     buildGraph();
