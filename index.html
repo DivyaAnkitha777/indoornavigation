@@ -112,15 +112,25 @@
 
         <h3>Test QR Codes</h3>
 
-        <div style="display:flex; justify-content:space-around; flex-wrap:wrap;">
-            <div>
-                <div id="qr-main" style="background:white; padding:10px;"></div>
+        <div style="display:flex; justify-content:space-around; flex-wrap:wrap; gap: 20px;">
+            <div style="text-align: center;">
+                <div id="qr-main" style="background:white; padding:10px; border-radius: 8px;"></div>
                 <p>Main Gate</p>
             </div>
 
-            <div>
-                <div id="qr-lib" style="background:white; padding:10px;"></div>
-                <p>Library</p>
+            <div style="text-align: center;">
+                <div id="qr-block-c" style="background:white; padding:10px; border-radius: 8px;"></div>
+                <p>Block C</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div id="qr-lib" style="background:white; padding:10px; border-radius: 8px;"></div>
+                <p>Library (G)</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div id="qr-canteen" style="background:white; padding:10px; border-radius: 8px;"></div>
+                <p>Canteen</p>
             </div>
         </div>
     </div>
@@ -142,8 +152,20 @@
                 height: 128
             });
 
+            new QRCode(document.getElementById("qr-block-c"), {
+                text: `${baseUrl}?start=block_c`,
+                width: 128,
+                height: 128
+            });
+
             new QRCode(document.getElementById("qr-lib"), {
                 text: `${baseUrl}?start=lib_entrance_g`,
+                width: 128,
+                height: 128
+            });
+
+            new QRCode(document.getElementById("qr-canteen"), {
+                text: `${baseUrl}?start=canteen`,
                 width: 128,
                 height: 128
             });
