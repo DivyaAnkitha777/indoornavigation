@@ -228,14 +228,34 @@
             }
 
             // TRY 2: HTML5QRCode Library Component Fallback
-            html5QrCode.scanFile(file, false)
-                .then(decodedText => {
-                    processScannedText(decodedText);
-                })
-                .catch(err => {
-                    document.getElementById("loadingText").style.display = "none";
-                    alert("❌ Could not read QR. This happens if the image is too blurry, skewed, or compressed (like via WhatsApp). Please try using the live camera or a clearer photo.");
-                });
+            // Add a padding (quiet zone) because html5QrCode notoriously fails on flush QR images
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+                canvas.width = img.width + 200;
+                canvas.height = img.height + 200;
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 100, 100);
+                
+                canvas.toBlob((blob) => {
+                    const paddedFile = new File([blob], "padded_qr.jpg", { type: "image/jpeg" });
+                    html5QrCode.scanFile(paddedFile, false)
+                        .then(decodedText => {
+                            processScannedText(decodedText);
+                        })
+                        .catch(err => {
+                            document.getElementById("loadingText").style.display = "none";
+                            alert("❌ Could not read QR. This happens if the image is too blurry, skewed, or compressed (like via WhatsApp). Please try using the live camera or a clearer photo.");
+                        });
+                }, "image/jpeg");
+            };
+            img.onerror = () => {
+                document.getElementById("loadingText").style.display = "none";
+                alert("❌ Invalid image file selected.");
+            };
         }
 
         function simulateScan(startNodeId) {
