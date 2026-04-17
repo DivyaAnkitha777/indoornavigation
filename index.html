@@ -213,6 +213,17 @@
 
             document.getElementById("loadingText").style.display = "block";
 
+            // If the live camera is currently scanning, stop it first to prevent conflict!
+            try {
+                if (html5QrCode && html5QrCode.getState() === 2 /* SCANNING */) {
+                    await html5QrCode.stop();
+                } else if (html5QrCode && html5QrCode.isScanning) {
+                    await html5QrCode.stop();
+                }
+            } catch (e) {
+                console.warn("Scanner stop issue:", e);
+            }
+
             try {
                 // TRY 1: Native BarcodeDetector API (Amazing for Android Chrome on WhatsApp/Skewed photos)
                 if ('BarcodeDetector' in window) {
