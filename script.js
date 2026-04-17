@@ -57,6 +57,8 @@ const translations = {
 let synth = window.speechSynthesis;
 let voices = [];
 function updateVoices() { voices = synth.getVoices(); }
+// Ensure voices are fetched immediately for browsers that support it
+updateVoices();
 if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = updateVoices;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -421,12 +423,24 @@ function speak(text) {
     if (currentLang === 'te') langCode = 'te-IN';
     if (currentLang === 'hi') langCode = 'hi-IN';
 
-    const voice = voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
-    if (voice) utterThis.voice = voice;
+    // If voices are empty (bug on some mobile browsers), refresh them now
+    if (voices.length === 0) updateVoices();
+
+    // Prioritize exact match, then rough match (e.g., 'te-IN' -> 'te')
+    const voice = voices.find(v => v.lang.replace('_', '-') === langCode) || 
+                  voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
+                  
+    if (voice) {
+        utterThis.voice = voice;
+    } else {
+        console.warn(`No native voice packet found on this device for ${langCode}. System falling back to default.`);
+    }
 
     utterThis.lang = langCode;
     utterThis.rate = currentLang === 'en' ? 1.0 : 0.8;
-    synth.speak(utterThis);
+    
+    // Slight pause to ensure voice engine is ready on mobile
+    setTimeout(() => { synth.speak(utterThis); }, 50);
 }
 
 // ======================= LIVE TRACKING (IF AVAILABLE) =====================

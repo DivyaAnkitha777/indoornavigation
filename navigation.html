@@ -18,10 +18,13 @@
         <div class="sidebar glass-panel">
             <h2 id="ui-title" style="display: flex; justify-content: space-between; align-items: center;">
                 <span>Navify</span>
-                <button onclick="triggerEmergency()" class="btn btn-danger" id="btn-emergency" style="font-size: 0.8rem; padding: 5px 10px; background-color: #EF4444; color: white;">🚨 Emergency Exit</button>
+                <button onclick="triggerEmergency()" class="btn btn-danger" id="btn-emergency"
+                    style="font-size: 0.8rem; padding: 5px 10px; background-color: #EF4444; color: white;">🚨 Emergency
+                    Exit</button>
             </h2>
 
-            <div id="offline-banner" class="alert-banner hidden" style="background: #FFFBEB; color: #B45309; border-color: #FCD34D;">
+            <div id="offline-banner" class="alert-banner hidden"
+                style="background: #FFFBEB; color: #B45309; border-color: #FCD34D;">
                 ⚠ Offline Mode: Limited functionality. Maps cached.
             </div>
 
@@ -49,13 +52,15 @@
 
             <div class="form-group">
                 <label id="ui-start">Starting Point</label>
-                <input type="text" id="start-node-display" readonly value="Detecting location..." class="input-readonly">
+                <input type="text" id="start-node-display" readonly value="Detecting location..."
+                    class="input-readonly">
             </div>
 
             <div class="form-group">
                 <label id="ui-dest">Destination</label>
-                <input type="text" id="destination-search" class="select-box" placeholder="Search: 'Library', 'Canteen', 'Admin'..." onkeyup="filterDestinations()">
-                
+                <input type="text" id="destination-search" class="select-box"
+                    placeholder="Search: 'Library', 'Canteen', 'Admin'..." onkeyup="filterDestinations()">
+
                 <div class="quick-chips">
                     <span class="chip" onclick="setQuickDestination('canteen')">☕ Canteen</span>
                     <span class="chip" onclick="setQuickDestination('lib_reading_1')">📚 Library Reading Room</span>
@@ -91,7 +96,8 @@
                 </label>
             </div>
 
-            <button onclick="calculateRoute()" class="btn btn-primary full-width" id="btn-get-dir">Get Directions</button>
+            <button onclick="calculateRoute()" class="btn btn-primary full-width" id="btn-get-dir">Get
+                Directions</button>
             <button onclick="toggleVoice()" id="voice-btn" class="btn btn-secondary full-width mt-10">
                 🔈 Voice Guide: OFF
             </button>
@@ -124,10 +130,10 @@
                     console.log('ServiceWorker registration failed: ', err);
                 });
             });
-            
+
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
-            
+
             function updateOnlineStatus() {
                 if (!navigator.onLine) {
                     document.getElementById('offline-banner').classList.remove('hidden');
