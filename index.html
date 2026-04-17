@@ -179,26 +179,32 @@
             html5QrCode.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
-
                 (decodedText) => {
                     html5QrCode.stop().then(() => {
-                        alert("✅ QR Detected! Redirecting...");
-                        let redirectUrl = decodedText;
-                        const navIndex = redirectUrl.indexOf("navigation.html");
-                        if (navIndex !== -1) {
-                            redirectUrl = redirectUrl.substring(navIndex);
-                        }
-                        window.location.href = redirectUrl;
+                        processScannedText(decodedText);
                     });
                 },
-
-                () => { }
-            ).catch(() => {
-                alert("❌ Camera access failed");
+                (errorMessage) => {
+                    // Ignore background scan errors
+                }
+            ).catch(err => {
+                document.getElementById("loadingText").style.display = "none";
+                alert("Camera Error: " + err);
             });
         }
 
-        function handleFileUpload(event) {
+        function processScannedText(decodedText) {
+            document.getElementById("loadingText").style.display = "none";
+            alert("✅ QR Detected! Redirecting...");
+            let redirectUrl = decodedText;
+            const navIndex = redirectUrl.indexOf("navigation.html");
+            if (navIndex !== -1) {
+                redirectUrl = redirectUrl.substring(navIndex);
+            }
+            window.location.href = redirectUrl;
+        }
+
+        async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -207,20 +213,28 @@
 
             document.getElementById("loadingText").style.display = "block";
 
-            html5QrCode.scanFile(file, true)
-                .then(decodedText => {
-                    document.getElementById("loadingText").style.display = "none";
-                    alert("✅ QR Detected! Redirecting...");
-                    let redirectUrl = decodedText;
-                    const navIndex = redirectUrl.indexOf("navigation.html");
-                    if (navIndex !== -1) {
-                        redirectUrl = redirectUrl.substring(navIndex);
+            try {
+                // TRY 1: Native BarcodeDetector API (Amazing for Android Chrome on WhatsApp/Skewed photos)
+                if ('BarcodeDetector' in window) {
+                    const barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code'] });
+                    const imgBitmap = await createImageBitmap(file);
+                    const barcodes = await barcodeDetector.detect(imgBitmap);
+                    if (barcodes.length > 0) {
+                        return processScannedText(barcodes[0].rawValue);
                     }
-                    window.location.href = redirectUrl;
+                }
+            } catch (e) {
+                console.warn("BarcodeDetector failed, falling back to html5QrCode", e);
+            }
+
+            // TRY 2: HTML5QRCode Library Component Fallback
+            html5QrCode.scanFile(file, false)
+                .then(decodedText => {
+                    processScannedText(decodedText);
                 })
                 .catch(err => {
                     document.getElementById("loadingText").style.display = "none";
-                    alert("❌ Could not read QR from the image. Please try another one.");
+                    alert("❌ Could not read QR. This happens if the image is too blurry, skewed, or compressed (like via WhatsApp). Please try using the live camera or a clearer photo.");
                 });
         }
 
